@@ -1,0 +1,168 @@
+{% extends 'tracker/base_new.html' %}
+{% load custom_filters %}
+{% block title %}My Expenses - Smart Expense Tracker{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h1>
+        <i class="fas fa-list" style="color: var(--primary-blue)"></i> My
+        Expenses
+      </h1>
+      <p class="page-subtitle">Manage and track all your expenses</p>
+    </div>
+    <a
+      href="{% url 'add_expense' %}"
+      class="btn btn-success btn-lg"
+      style="white-space: nowrap"
+    >
+      <i class="fas fa-plus"></i> Add Expense
+    </a>
+  </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card summary-card card-total h-100">
+      <div class="card-body">
+        <div class="summary-card-icon blue">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <p class="summary-card-label">Total Expenses</p>
+        <h3 class="summary-card-amount">₹{{ total_expenses|floatformat:2 }}</h3>
+        <p class="summary-card-subtitle">{{ total_count }} transactions</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card summary-card card-month h-100">
+      <div class="card-body">
+        <div class="summary-card-icon green">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <p class="summary-card-label">Average Expense</p>
+        {% if total_count > 0 %}
+        <h3 class="summary-card-amount">
+          ₹{{ total_expenses|divide:total_count|floatformat:2 }}
+        </h3>
+        {% else %}
+        <h3 class="summary-card-amount">₹0.00</h3>
+        {% endif %}
+        <p class="summary-card-subtitle">per transaction</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card summary-card card-category h-100">
+      <div class="card-body">
+        <div class="summary-card-icon yellow">
+          <i class="fas fa-th"></i>
+        </div>
+        <p class="summary-card-label">Categories Used</p>
+        <h3 class="summary-card-amount">{{ category_data|length }}</h3>
+        <p class="summary-card-subtitle">spending categories</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card summary-card card-helping h-100">
+      <div class="card-body">
+        <div class="summary-card-icon cyan">
+          <i class="fas fa-download"></i>
+        </div>
+        <p class="summary-card-label">Download Report</p>
+        <a href="{% url 'download_csv' %}" class="btn btn-sm btn-primary mt-2">
+          <i class="fas fa-file-csv"></i> CSV Export
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Buttons -->
+<div class="mb-4">
+  <div class="page-actions">
+    <a href="{% url 'expense_list' %}" class="btn btn-outline-primary">
+      <i class="fas fa-calendar"></i> All Expenses
+    </a>
+    <a href="?filter=today" class="btn btn-outline-primary">
+      <i class="fas fa-calendar-day"></i> Today
+    </a>
+    <a href="?filter=week" class="btn btn-outline-primary">
+      <i class="fas fa-calendar-week"></i> This Week
+    </a>
+    <a href="?filter=month" class="btn btn-outline-primary">
+      <i class="fas fa-calendar-alt"></i> This Month
+    </a>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- Expenses List -->
+{% if expenses %}
+<div class="row">
+  {% for expense in expenses %}
+  <div class="col-lg-6 col-xl-4 mb-4">
+    <div class="card expense-card h-100">
+      <div class="card-body">
+        <div class="expense-card-header">
+          <h5 class="expense-card-title">{{ expense.description }}</h5>
+          <span class="badge badge-{{ expense.category|lower }}">
+            {{ expense.category }}
+          </span>
+        </div>
+
+        <p class="expense-card-amount">₹{{ expense.amount|floatformat:2 }}</p>
+
+        <div class="expense-card-meta">
+          <div class="expense-card-meta-item">
+            <i class="fas fa-calendar"></i>
+            <span>{{ expense.date|date:"M d, Y" }}</span>
+          </div>
+        </div>
+
+        {% if expense.notes %}
+        <p class="text-muted small mb-3">
+          <i class="fas fa-sticky-note"></i> {{ expense.notes|truncatewords:15 }}
+        </p>
+        {% endif %}
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+          "
+        >
+          <a
+            href="{% url 'edit_expense' expense.id %}"
+            class="btn btn-sm btn-warning"
+          >
+            <i class="fas fa-edit"></i> Edit
+          </a>
+          <a
+            href="{% url 'delete_expense' expense.id %}"
+            class="btn btn-sm btn-danger"
+          >
+            <i class="fas fa-trash"></i> Delete
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+  <i class="fas fa-info-circle"></i>
+  <strong>No expenses found!</strong> Start by
+  <a href="{% url 'add_expense' %}" class="alert-link">adding a new expense</a>.
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %} {% endblock %}

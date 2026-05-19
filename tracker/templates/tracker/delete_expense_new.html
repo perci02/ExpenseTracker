@@ -1,0 +1,74 @@
+{% extends 'tracker/base_new.html' %}
+{% block title %}Delete Expense - Smart Expense Tracker{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-5">
+    <div class="page-header">
+      <h1 style="color: var(--danger-red)">
+        <i class="fas fa-exclamation-triangle"></i> Delete Expense
+      </h1>
+      <p class="page-subtitle">This action cannot be undone</p>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--danger-red)">
+      <div class="card-body p-4">
+        <p class="mb-4">
+          Are you sure you want to permanently delete this expense?
+        </p>
+
+        <div
+          class="card"
+          style="
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-light);
+            margin-bottom: 2rem;
+          "
+        >
+          <div class="card-body">
+            <h5 class="card-title" style="color: var(--warning-yellow)">
+              <i class="fas fa-receipt"></i> {{ expense.description }}
+            </h5>
+            <p class="mb-2">
+              <strong>Amount:</strong>
+              <span
+                style="
+                  color: var(--danger-red);
+                  font-weight: 700;
+                  font-size: 1.25rem;
+                "
+              >
+                ₹{{ expense.amount|floatformat:2 }}
+              </span>
+            </p>
+            <p class="mb-2">
+              <strong>Category:</strong>
+              <span class="badge badge-{{ expense.category|lower }}"
+                >{{ expense.category }}</span
+              >
+            </p>
+            <p class="mb-2">
+              <strong>Date:</strong> {{ expense.date|date:"F d, Y" }}
+            </p>
+            {% if expense.notes %}
+            <p class="mb-0"><strong>Notes:</strong> {{ expense.notes }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <form method="POST" novalidate>
+          {% csrf_token %}
+
+          <div class="page-actions">
+            <button type="submit" class="btn btn-danger btn-lg">
+              <i class="fas fa-trash"></i> Yes, Delete
+            </button>
+            <a href="{% url 'expense_list' %}" class="btn btn-outline-primary">
+              <i class="fas fa-times"></i> Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

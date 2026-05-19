@@ -1,0 +1,69 @@
+{% extends 'tracker/base_new.html' %} {% block title %}Add Expense - Smart
+Expense Tracker{% endblock %} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="page-header">
+      <h1>
+        <i class="fas fa-plus-circle" style="color: var(--success-green)"></i>
+        Add New Expense
+      </h1>
+      <p class="page-subtitle">
+        Record your expense and let the app predict the category
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="POST" novalidate>
+          {% csrf_token %} {% if form.non_field_errors %}
+          <div
+            class="alert alert-danger alert-dismissible fade show mb-3"
+            role="alert"
+          >
+            {% for error in form.non_field_errors %}
+            <i class="fas fa-exclamation-circle"></i> {{ error }} {% endfor %}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+            ></button>
+          </div>
+          {% endif %}
+          {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}" class="form-label">
+              {{ field.label }}
+              {% if field.field.required %}
+              <span style="color: var(--danger-red)">*</span>
+              {% endif %}
+            </label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in field.errors %}
+              <i class="fas fa-exclamation-triangle"></i> {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+
+          <div class="page-actions mt-4">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="fas fa-save"></i> Save Expense
+            </button>
+            <a href="{% url 'expense_list' %}" class="btn btn-outline-primary">
+              <i class="fas fa-times"></i> Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <p class="text-muted small mt-3 text-center">
+      <i class="fas fa-info-circle"></i> The category will be automatically
+      predicted based on your description
+    </p>
+  </div>
+</div>
+{% endblock %}

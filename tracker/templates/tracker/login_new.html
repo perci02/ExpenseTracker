@@ -1,0 +1,60 @@
+{% extends 'tracker/base_new.html' %} {% block title %}Login - Smart Expense
+Tracker{% endblock %} {% block content %}
+<div
+  style="
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  "
+>
+  <div class="col-sm-12 col-md-6 col-lg-4">
+    <div class="card">
+      <div class="card-body p-4">
+        <h2 class="text-center mb-4">
+          <i class="fas fa-sign-in-alt" style="color: var(--primary-blue)"></i>
+          <br />Login
+        </h2>
+
+        <form method="POST" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {% for error in form.non_field_errors %}
+            <i class="fas fa-exclamation-circle"></i> {{ error }}
+            {% endfor %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          {% endif %}
+          {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="invalid-feedback">
+              {% for error in field.errors %}
+              <i class="fas fa-exclamation-triangle"></i> {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+
+          <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">
+            <i class="fas fa-arrow-right"></i> Login
+          </button>
+        </form>
+
+        <hr style="margin: 1.5rem 0" />
+
+        <p class="text-center text-muted">
+          Don't have an account?
+          <a href="{% url 'register' %}" class="fw-bold text-primary">
+            Create one <i class="fas fa-arrow-right"></i>
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

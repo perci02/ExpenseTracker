@@ -1,0 +1,283 @@
+{% extends 'tracker/base.html' %} {% load custom_filters %} {% block title
+%}Home - Smart Expense Tracker{% endblock %} {% block content %}
+<div class="container-fluid">
+  {% if user.is_authenticated %}
+  <!-- Welcome Section -->
+  <div class="row mb-5 pt-4">
+    <div class="col-12">
+      <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold mb-2">
+          Welcome back, <span class="text-primary">{{ user.username }}</span>
+        </h1>
+        <p class="lead text-muted">Here's your expense summary</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row mb-5">
+    <!-- Total Expenses Card -->
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="card h-100 border-primary border-2 shadow-sm">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="fas fa-wallet fa-3x text-primary"></i>
+          </div>
+          <h6 class="card-title text-muted text-uppercase fw-bold">
+            Total Expenses
+          </h6>
+          <h2 class="text-primary fw-bold">
+            ₹{{ total_expenses|floatformat:2 }}
+          </h2>
+          <p class="text-muted small mb-0">
+            {{ total_count }} expenses recorded
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- This Month Card -->
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="card h-100 border-success border-2 shadow-sm">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="fas fa-calendar-alt fa-3x text-success"></i>
+          </div>
+          <h6 class="card-title text-muted text-uppercase fw-bold">
+            This Month
+          </h6>
+          <h2 class="text-success fw-bold">
+            ₹{{ this_month_expenses|floatformat:2 }}
+          </h2>
+          <p class="text-muted small mb-0">{{ today|date:"F, Y" }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today Card -->
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="card h-100 border-warning border-2 shadow-sm">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="fas fa-calendar-day fa-3x text-warning"></i>
+          </div>
+          <h6 class="card-title text-muted text-uppercase fw-bold">Today</h6>
+          <h2 class="text-warning fw-bold">
+            ₹{{ today_expenses|floatformat:2 }}
+          </h2>
+          <p class="text-muted small mb-0">{{ today|date:"d M, Y" }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Average Card -->
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="card h-100 border-info border-2 shadow-sm">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="fas fa-chart-line fa-3x text-info"></i>
+          </div>
+          <h6 class="card-title text-muted text-uppercase fw-bold">Average</h6>
+          <h2 class="text-info fw-bold">
+            {% if total_count > 0 %} ₹{{
+            total_expenses|divide:total_count|floatformat:2 }} {% else %} ₹0.00
+            {% endif %}
+          </h2>
+          <p class="text-muted small mb-0">per expense</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Breakdown Section -->
+  {% if category_data %}
+  <div class="row mb-5">
+    <div class="col-12">
+      <h3 class="mb-4 fw-bold">
+        <i class="fas fa-th text-primary"></i> Expenses by Category
+      </h3>
+
+      <div class="row">
+        {% for category in category_data %}
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100 border-secondary">
+            <div class="card-body">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <h5 class="card-title mb-0">
+                  {% if category.category == 'Food' %}
+                  <i class="fas fa-utensils text-danger"></i>
+                  {% elif category.category == 'Travel' %}
+                  <i class="fas fa-car text-info"></i>
+                  {% elif category.category == 'Shopping' %}
+                  <i class="fas fa-shopping-bag text-success"></i>
+                  {% elif category.category == 'Bills' %}
+                  <i class="fas fa-file-invoice-dollar text-warning"></i>
+                  {% elif category.category == 'Entertainment' %}
+                  <i class="fas fa-gamepad text-primary"></i>
+                  {% elif category.category == 'Ministry' %}
+                  <i
+                    class="fas fa-church text-violet"
+                    style="color: #9333ea"
+                  ></i>
+                  {% elif category.category == 'Helping' %}
+                  <i class="fas fa-heart text-danger"></i>
+                  {% else %}
+                  <i class="fas fa-question-circle text-muted"></i>
+                  {% endif %} {{ category.category }}
+                </h5>
+                <span class="badge bg-primary">{{ category.count }}</span>
+              </div>
+
+              <h4 class="text-primary fw-bold mb-3">
+                ₹{{ category.total|floatformat:2 }}
+              </h4>
+
+              <div class="progress mb-3" style="height: 8px">
+                <div
+                  class="progress-bar"
+                  style="width: {% widthratio category.total total_expenses 100 %}%"
+                ></div>
+              </div>
+
+              <p class="text-muted small mb-0">
+                {% widthratio category.total total_expenses 100 %}% of total
+              </p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Quick Actions Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <h3 class="mb-4 fw-bold">
+        <i class="fas fa-bolt text-warning"></i> Quick Actions
+      </h3>
+
+      <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+          <a href="{% url 'add_expense' %}" class="text-decoration-none">
+            <div class="card h-100 card-hover">
+              <div class="card-body text-center py-5">
+                <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Add Expense</h5>
+                <p class="card-text text-muted">Record a new expense quickly</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4">
+          <a href="{% url 'expense_list' %}" class="text-decoration-none">
+            <div class="card h-100 card-hover">
+              <div class="card-body text-center py-5">
+                <i class="fas fa-list fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">View All Expenses</h5>
+                <p class="card-text text-muted">Manage your expenses</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4">
+          <a href="{% url 'expense_chart' %}" class="text-decoration-none">
+            <div class="card h-100 card-hover">
+              <div class="card-body text-center py-5">
+                <i class="fas fa-chart-pie fa-3x text-success mb-3"></i>
+                <h5 class="card-title">View Analytics</h5>
+                <p class="card-text text-muted">Visualize your spending</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Unauthenticated User -->
+  <div class="row align-items-center min-vh-75 py-5">
+    <div class="col-md-8 mx-auto">
+      <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">
+          <i class="fas fa-wallet text-primary"></i> Smart Expense Tracker
+        </h1>
+        <p class="lead text-muted">
+          Manage your expenses efficiently and track your spending
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <h5 class="card-title mb-4">
+            Get Started with Smart Expense Tracker
+          </h5>
+          <p class="text-muted mb-4">
+            Track, analyze, and manage your expenses like never before
+          </p>
+
+          <div class="d-grid gap-3">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+              <i class="fas fa-sign-in-alt"></i> Login to Your Account
+            </a>
+            <a href="{% url 'register' %}" class="btn btn-success btn-lg">
+              <i class="fas fa-user-plus"></i> Create New Account
+            </a>
+          </div>
+
+          <hr class="my-4" />
+          <p class="small text-muted">
+            <i class="fas fa-info-circle"></i>
+            Already have an account? <a href="{% url 'login' %}">Login here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .card-hover {
+    transition: all 0.3s ease;
+    border: 1px solid #30363d;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-8px);
+    border-color: #1f6feb;
+    box-shadow: 0 8px 16px rgba(31, 111, 235, 0.2);
+  }
+
+  .border-primary {
+    border-color: var(--primary-color) !important;
+  }
+
+  .border-success {
+    border-color: var(--secondary-color) !important;
+  }
+
+  .border-warning {
+    border-color: var(--warning-color) !important;
+  }
+
+  .border-info {
+    border-color: #0ea5e9 !important;
+  }
+
+  .min-vh-75 {
+    min-height: 75vh;
+  }
+
+  .progress-bar {
+    background-color: var(--primary-color);
+    transition: width 0.6s ease;
+  }
+</style>
+{% endblock %}

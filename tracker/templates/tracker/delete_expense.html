@@ -1,0 +1,58 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Delete Expense - Smart Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center py-5">
+        <div class="col-md-5">
+            <div class="card border-danger">
+                <div class="card-header bg-danger bg-opacity-10 border-danger">
+                    <h2 class="card-title mb-0">
+                        <i class="fas fa-trash text-danger"></i> Delete Expense
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong> Warning!</strong> This action cannot be undone.
+                    </div>
+                    
+                    <p class="mb-4">
+                        Are you sure you want to delete this expense?
+                    </p>
+                    
+                    <div class="card bg-dark border-secondary mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title text-warning">
+                                <i class="fas fa-receipt"></i> {{ expense.description }}
+                            </h5>
+                            <p class="mb-2"><strong>Amount:</strong> <span class="text-danger">₹{{ expense.amount }}</span></p>
+                            <p class="mb-2"><strong>Category:</strong> {{ expense.category }}</p>
+                            <p class="mb-2"><strong>Date:</strong> {{ expense.date }}</p>
+                            {% if expense.notes %}
+                                <p class="mb-0"><strong>Notes:</strong> {{ expense.notes }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-check"></i> Yes, Delete Expense
+                            </button>
+                            <a href="{% url 'expense_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+    Cancel
+</a>

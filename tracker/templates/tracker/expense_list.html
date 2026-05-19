@@ -1,0 +1,194 @@
+{% extends 'tracker/base.html' %} {% load custom_filters %} {% block title %}My
+Expenses - Smart Expense Tracker{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row py-4">
+    <div class="col-12">
+      <!-- Statistics Cards -->
+      <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="card h-100 border-primary border-2">
+            <div class="card-body text-center">
+              <h6 class="card-title text-muted text-uppercase fw-bold">
+                Total Expenses
+              </h6>
+              <h3 class="text-primary fw-bold">
+                ₹{{ total_expenses|floatformat:2 }}
+              </h3>
+              <p class="text-muted small mb-0">{{ total_count }} expenses</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="card h-100 border-success border-2">
+            <div class="card-body text-center">
+              <h6 class="card-title text-muted text-uppercase fw-bold">
+                Average Expense
+              </h6>
+              <h3 class="text-success fw-bold">
+                {% if total_count > 0 %} ₹{{
+                total_expenses|divide:total_count|floatformat:2 }} {% else %}
+                ₹0.00 {% endif %}
+              </h3>
+              <p class="text-muted small mb-0">per transaction</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="card h-100 border-warning border-2">
+            <div class="card-body text-center">
+              <h6 class="card-title text-muted text-uppercase fw-bold">
+                Categories
+              </h6>
+              <h3 class="text-warning fw-bold">{{ category_data|length }}</h3>
+              <p class="text-muted small mb-0">spending categories</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="card h-100 border-info border-2">
+            <div class="card-body text-center">
+              <h6 class="card-title text-muted text-uppercase fw-bold">
+                Download Report
+              </h6>
+              <a
+                href="{% url 'download_csv' %}"
+                class="btn btn-sm btn-info mt-2"
+              >
+                <i class="fas fa-download"></i> CSV Report
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="my-4" />
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="fas fa-list text-primary"></i> My Expenses
+        </h2>
+        <a href="{% url 'add_expense' %}" class="btn btn-success">
+          <i class="fas fa-plus-circle"></i> Add New Expense
+        </a>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="btn-group mb-4" role="group">
+        <a href="{% url 'expense_list' %}" class="btn btn-outline-primary">
+          <i class="fas fa-calendar-alt"></i> All
+        </a>
+        <a href="?filter=today" class="btn btn-outline-primary">
+          <i class="fas fa-calendar-day"></i> Today
+        </a>
+        <a href="?filter=week" class="btn btn-outline-primary">
+          <i class="fas fa-calendar-week"></i> This Week
+        </a>
+        <a href="?filter=month" class="btn btn-outline-primary">
+          <i class="fas fa-calendar-alt"></i> This Month
+        </a>
+      </div>
+
+      <!-- Expenses List -->
+      {% if expenses %}
+      <div class="row">
+        {% for expense in expenses %}
+        <div class="col-lg-6 col-xl-4 mb-4">
+          <div class="card h-100 border-secondary">
+            <div class="card-header bg-dark border-secondary">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0 text-truncate">
+                  {{ expense.description }}
+                </h5>
+                <span class="badge bg-primary">{{ expense.category }}</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <h4 class="text-danger">
+                  <i class="fas fa-rupee-sign"></i> {{ expense.amount }}
+                </h4>
+              </div>
+              <ul class="list-unstyled small text-muted">
+                <li class="mb-2">
+                  <i class="fas fa-calendar text-info"></i>
+                  <strong>Date:</strong> {{ expense.date|date:"M d, Y" }}
+                </li>
+                {% if expense.notes %}
+                <li class="mb-2">
+                  <i class="fas fa-sticky-note text-warning"></i>
+                  <strong>Notes:</strong> {{ expense.notes|truncatewords:10 }}
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+            <div class="card-footer bg-dark border-top border-secondary">
+              <div class="d-grid gap-2 gap-sm-1">
+                <a
+                  href="{% url 'edit_expense' expense.id %}"
+                  class="btn btn-sm btn-warning text-dark"
+                >
+                  <i class="fas fa-edit"></i> Edit
+                </a>
+                <a
+                  href="{% url 'delete_expense' expense.id %}"
+                  class="btn btn-sm btn-danger"
+                >
+                  <i class="fas fa-trash"></i> Delete
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="fas fa-info-circle"></i>
+        <strong>No expenses found!</strong> Start by
+        <a href="{% url 'add_expense' %}" class="alert-link"
+          >adding a new expense</a
+        >.
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+        ></button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .card {
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+  }
+
+  .btn-group {
+    flex-wrap: wrap;
+  }
+
+  .border-primary {
+    border-color: var(--primary-color) !important;
+  }
+
+  .border-success {
+    border-color: var(--secondary-color) !important;
+  }
+
+  .border-warning {
+    border-color: var(--warning-color) !important;
+  }
+
+  .border-info {
+    border-color: #0ea5e9 !important;
+  }
+</style>
+{% endblock %}
